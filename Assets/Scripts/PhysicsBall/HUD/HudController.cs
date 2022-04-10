@@ -4,17 +4,17 @@ namespace ClassicGames.PhysicsBall.HUD
 {
     public class HudController : MonoBehaviour
     {
-        [SerializeField] private TMPro.TextMeshProUGUI _ballsCounter;
-        [SerializeField] private TMPro.TextMeshProUGUI _scoreCounter;
+        [SerializeField] private TMPro.TextMeshProUGUI ballsCounter;
+        [SerializeField] private TMPro.TextMeshProUGUI scoreCounter;
 
-        public void ChangeBallsCounter(int count)
-        {
-            _ballsCounter.text = count.ToString();
+        public void OnChangedScore(int score)
+{
+            scoreCounter.text = score.ToString();
         }
 
-        public void ChangeScoreCounter(int score)
+        public void OnChangedNumberOfBalls(int count)
         {
-            _scoreCounter.text = score.ToString();
+            ballsCounter.text = count.ToString();
         }
     }
 }

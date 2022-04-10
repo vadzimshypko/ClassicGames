@@ -1,53 +1,35 @@
 using System.Collections.Generic;
-
+using ClassicGames.PhysicsBall.Triggers;
+using ClassicGames.Singletons;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace ClassicGames.PhysicsBall.Triggers
+namespace ClassicGames.PhysicsBall
 {
-    public class CollectablesManager : MonoBehaviour
+    public class CollectablesManager : MonoBehaviour, IGameStageListener
     {
-        [SerializeField] private Rect _spaceForGeneration;
-        [SerializeField] private GameObject _prefabCollectable;
+        [SerializeField] private Rect spaceToGenerate;
+        [SerializeField] private GameObject prefabCollectable;
 
-        private HashSet<GameObject> _collectables = new HashSet<GameObject>();
+        private readonly HashSet<GameObject> _collectables = new();
 
-        public UnityEvent<int> OnChangeScore;
-
-        public int Score { private set; get; }
-
-        void Start()
-        {
-            Score = 0;
-            GenerateCollectable();
-        }
-
-        public void Restart()
-        {
-            foreach (var collectable in _collectables)
-            {
-                Destroy(collectable);
-            }
-            _collectables.Clear();
-            GenerateCollectable();
-            OnChangeScore.Invoke(Score = 0);
-        }
+        public UnityEvent<int> changedScore;
 
         private void GenerateCollectable()
         {
-            Vector2 offset = new Vector2(Random.Range(0, _spaceForGeneration.width), Random.Range(0, _spaceForGeneration.height));
-            GameObject collectable = Instantiate(_prefabCollectable, _spaceForGeneration.position + offset, Quaternion.identity);
-            collectable.GetComponent<TriggerToCollectables>().OnCollected = ReactOnCollected;
+            Vector2 offset = new Vector2(Random.Range(0, spaceToGenerate.width), Random.Range(0, spaceToGenerate.height));
+            GameObject collectable = Instantiate(prefabCollectable, spaceToGenerate.position + offset, Quaternion.identity);
             _collectables.Add(collectable);
+            collectable.GetComponent<TriggerEnteredEvent>().triggerEnteredEvent.AddListener(OnCollected);
         }
 
-        private void ReactOnCollected(GameObject collectable)
+        private void OnCollected(GameObject trigger, GameObject visitor)
         {
-            if (_collectables.Contains(collectable))
+            if (_collectables.Contains(trigger))
             {
-                Score++;
-                OnChangeScore.Invoke(Score);
-                _collectables.Remove(collectable);
+                _collectables.Remove(trigger);
+                Destroy(trigger);
+                changedScore.Invoke(++State.Instance.Score);
                 GenerateCollectable();
             }
         }
@@ -58,7 +40,26 @@ namespace ClassicGames.PhysicsBall.Triggers
         private void OnDrawGizmos()
         {
             Gizmos.color = new Color(1f, 1f, 0f, 0.3f);
-            Gizmos.DrawCube(_spaceForGeneration.center, _spaceForGeneration.size);
+            Gizmos.DrawCube(spaceToGenerate.center, spaceToGenerate.size);
+        }
+
+        void IGameStageListener.OnGameInitialized()
+        {
+            changedScore.Invoke(State.Instance.Score = 0);
+        }
+
+        void IGameStageListener.OnGameStarted()
+        {
+            GenerateCollectable();
+        }
+
+        void IGameStageListener.OnGameWasOver(int score)
+        {
+            foreach (var collectable in _collectables)
+            {
+                Destroy(collectable);
+            }
+            _collectables.Clear();
         }
     }
 }

@@ -1,7 +1,4 @@
-using ClassicGames.PhysicsBall.Triggers;
-
 using System.Collections.Generic;
-
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -9,44 +6,41 @@ namespace ClassicGames.PhysicsBall
 {
     public class BallsManager : MonoBehaviour
     {
-        [SerializeField] private DeathLineCollisionWithBall _deathLine;
-        [SerializeField] private GameObject _prefabBall;
-        [SerializeField] private Rect _spaceForGeneration;
+        private readonly LinkedList<GameObject> _balls = new();
 
-        private LinkedList<GameObject> _balls = new LinkedList<GameObject>();
+        [SerializeField] private GameObject prefabBall;
+        [SerializeField] private Rect spaceToGenerate;
 
-        public UnityEvent<int> OnChangedBallsCount;
+        public UnityEvent<int> changedNumberOfBalls;
 
-        public void Start()
-        {
-            _deathLine.DeathLineCollision += (collider) => { RemoveBall(collider.gameObject); };
-        }
-
-        /* External methods */
-
-        public void RemoveLastBall()
-        {
-            if (_balls.Count != 0)
-            {
-                RemoveBall();
-            }
-        }
+        /* Interface */
 
         public void GenerateNewBall()
         {
-            GameObject newBall = Instantiate(_prefabBall, GetRandomPosition(), Quaternion.identity);
-            SpriteRenderer newSprite = newBall.GetComponent<SpriteRenderer>();
-            newSprite.color = GetRandomColor();
+            var newBall = Instantiate(prefabBall, GenerateRandomPosition(spaceToGenerate), Quaternion.identity);
+            var newSprite = newBall.GetComponent<SpriteRenderer>();
+            newSprite.color = GenerateRandomColor();
             _balls.AddLast(newBall);
-            OnChangedBallsCount.Invoke(_balls.Count);
+            changedNumberOfBalls.Invoke(_balls.Count);
+            Debug.Log($"Generates ball with position = {newBall.transform.position.ToString()}, color = {newSprite.color.ToString()}");
+        }
 
-            Debug.Log("Generates ball with position = " + newBall.transform.position + ", color = " + newSprite.color);
+        public void OnDeathLineEntered(GameObject trigger, GameObject visitor)
+        {
+            RemoveBall(visitor);
         }
 
         /* Private methods */
-
-        private void RemoveBall(GameObject ball = null)
+        
+        public void RemoveBall(GameObject ball = null)
         {
+            if (_balls.Count <= 0)
+            {
+                Debug.LogError($"We try to remove ball: {ball}, but _balls.count = 0");
+                Destroy(ball);
+                return;
+            }
+            
             if (ball != null)
             {
                 _balls.Remove(ball);
@@ -56,17 +50,18 @@ namespace ClassicGames.PhysicsBall
                 ball = _balls.Last.Value;
                 _balls.RemoveLast();
             }
+
             Destroy(ball);
-            OnChangedBallsCount.Invoke(_balls.Count);
+            changedNumberOfBalls.Invoke(_balls.Count);
         }
 
-        private Vector2 GetRandomPosition()
+        private Vector2 GenerateRandomPosition(Rect space)
         {
-            Vector2 offset = new Vector2(Random.Range(0, _spaceForGeneration.width), Random.Range(0, _spaceForGeneration.height));
-            return _spaceForGeneration.position + offset;
+            Vector2 offset = new(Random.Range(0, space.width), Random.Range(0, space.height));
+            return space.position + offset;
         }
 
-        private Color GetRandomColor()
+        private Color GenerateRandomColor()
         {
             return new Color(0.5F, 1f, Random.value, 1f);
         }
@@ -77,7 +72,7 @@ namespace ClassicGames.PhysicsBall
         private void OnDrawGizmos()
         {
             Gizmos.color = new Color(0.5f, 1f, 0f, 0.3f);
-            Gizmos.DrawCube(_spaceForGeneration.center, _spaceForGeneration.size);
+            Gizmos.DrawCube(spaceToGenerate.center, spaceToGenerate.size);
         }
     }
 }

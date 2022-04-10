@@ -11,4 +11,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/PhysicsBall.unity
     guid: 2cda990e2423bbf4892e6590ba056729
-  m_configObjects: {}
+  m_configObjects:
+    com.unity.adaptiveperformance.loader_settings: {fileID: 11400000, guid: 7460847cc82c74d478761c7b67e277f3, type: 2}
+    com.unity.adaptiveperformance.simulator.provider_settings: {fileID: 11400000, guid: 8e9959008c7bc6647896448b64361c6f, type: 2}
+    com.unity.input.settings: {fileID: 11400000, guid: 85da47830c681f642a5c0bb0170f923d, type: 2}

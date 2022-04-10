@@ -3,7 +3,7 @@ using UnityEngine.SceneManagement;
 
 namespace ClassicGames.Menu
 {
-    public class MainMenuController : MonoBehaviour
+    public class MainMenuHandler : MonoBehaviour
     {
         public void LoadPhysicsBall()
         {
