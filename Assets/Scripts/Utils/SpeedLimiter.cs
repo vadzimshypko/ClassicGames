@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace ClassicGames.PhysicsBall
+namespace ClassicGames.Utils
 {
     [RequireComponent(typeof(Rigidbody2D))]
     public class SpeedLimiter : MonoBehaviour

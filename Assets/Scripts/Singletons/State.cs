@@ -8,28 +8,16 @@ namespace ClassicGames.Singletons
 
         public static State Instance => _instance ??= new();
 
-        private int _score;
-        public int Score
-        {
-            get => _score;
-            set
-            {
-                _score = value;
-                if (BestScore < value)
-                {
-                    BestScore = _score;
-                }
-            }
-        }
-
         private int _bestScore;
         public int BestScore
         {
             get => _bestScore;
             set
             {
+                if (value <= _bestScore) return;
+                
                 _bestScore = value;
-                PlayerPrefs.SetInt(Constants.BEST_SCORE_IN_PHYSICS_BALL, Score);
+                PlayerPrefs.SetInt(Constants.BEST_SCORE_IN_PHYSICS_BALL, value);
                 PlayerPrefs.Save();
             }
         }

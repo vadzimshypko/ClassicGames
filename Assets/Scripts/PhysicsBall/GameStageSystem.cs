@@ -1,16 +1,19 @@
 using System.Collections.Generic;
-using ClassicGames.Singletons;
 using UnityEngine;
 using static UnityEngine.InputSystem.InputAction;
 
 namespace ClassicGames.PhysicsBall
 {
+    /**
+     * Subscribes to change the game stage of all components which have implementation {@link IGameStageListener}.
+     */
     [DisallowMultipleComponent]
     public class GameStageSystem : MonoBehaviour
     {
         private BoardInput _controls;
 
         private int _balls;
+        private int _score;
 
         private readonly List<IGameStageListener> _gameStateListeners = new();
 
@@ -29,6 +32,11 @@ namespace ClassicGames.PhysicsBall
             {
                 FinishGames();
             }
+        }
+        
+        public void OnChangedScore(int newScore)
+        {
+            _score  = newScore;
         }
 
         private void Awake()
@@ -86,8 +94,7 @@ namespace ClassicGames.PhysicsBall
             Time.timeScale = 0;
             for (int i = 0; i < _gameStateListeners.Count; i++)
             {
-                IGameStageListener listener = _gameStateListeners[i];
-                listener.OnGameWasOver(State.Instance.Score);
+                _gameStateListeners[i].OnGameWasOver(_score);
             }
         }
     }

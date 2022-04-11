@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace ClassicGames.PhysicsBall
+namespace ClassicGames.PhysicsBall.Managers
 {
     public class BallsManager : MonoBehaviour
     {

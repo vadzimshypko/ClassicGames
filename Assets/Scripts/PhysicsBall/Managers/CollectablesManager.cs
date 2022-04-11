@@ -1,10 +1,13 @@
+using System;
 using System.Collections.Generic;
 using ClassicGames.PhysicsBall.Triggers;
 using ClassicGames.Singletons;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.SocialPlatforms.Impl;
+using Random = UnityEngine.Random;
 
-namespace ClassicGames.PhysicsBall
+namespace ClassicGames.PhysicsBall.Managers
 {
     public class CollectablesManager : MonoBehaviour, IGameStageListener
     {
@@ -13,7 +16,8 @@ namespace ClassicGames.PhysicsBall
 
         private readonly HashSet<GameObject> _collectables = new();
 
-        public UnityEvent<int> changedScore;
+        private int _score = 0;
+        public UnityEvent<int> changedScore = new();
 
         private void GenerateCollectable()
         {
@@ -29,9 +33,15 @@ namespace ClassicGames.PhysicsBall
             {
                 _collectables.Remove(trigger);
                 Destroy(trigger);
-                changedScore.Invoke(++State.Instance.Score);
+                changedScore.Invoke(++_score);
+                checkBestScore();
                 GenerateCollectable();
             }
+        }
+
+        private void checkBestScore()
+        {
+            State.Instance.BestScore = _score;
         }
 
         /*
@@ -45,7 +55,7 @@ namespace ClassicGames.PhysicsBall
 
         void IGameStageListener.OnGameInitialized()
         {
-            changedScore.Invoke(State.Instance.Score = 0);
+            changedScore.Invoke(_score = 0);
         }
 
         void IGameStageListener.OnGameStarted()

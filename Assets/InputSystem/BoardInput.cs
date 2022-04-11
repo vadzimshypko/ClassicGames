@@ -32,7 +32,7 @@ public partial class @BoardInput : IInputActionCollection2, IDisposable
                     ""type"": ""Value"",
                     ""id"": ""d961c8c2-19e7-45ba-b6c3-1f60f36f5222"",
                     ""expectedControlType"": ""Axis"",
-                    ""processors"": ""Clamp(min=-100,max=100)"",
+                    ""processors"": ""Clamp(min=-10,max=10)"",
                     ""interactions"": """",
                     ""initialStateCheck"": true
                 }
@@ -52,7 +52,7 @@ public partial class @BoardInput : IInputActionCollection2, IDisposable
                 {
                     ""name"": ""HorizontalKeyboard"",
                     ""id"": ""00ca640b-d935-4593-8157-c05846ea39b3"",
-                    ""path"": ""1DAxis(minValue=-100,maxValue=100)"",
+                    ""path"": ""1DAxis(minValue=-10,maxValue=10)"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
